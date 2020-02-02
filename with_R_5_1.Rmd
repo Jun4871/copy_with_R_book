@@ -1,0 +1,30 @@
+---
+title: "데이터 분석"
+author: "Jun"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    highlight: textmate
+    theme: default
+    toc: true
+    toc_float: true
+    code_folding: show
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview : 데이터 분석
+데이터 분석에 있어서 목적을 명확히 하는 것은 매우 중요하다. 목적을 명확히 함으로써 데이터 가공 형태와 분석 방법이 결정되기 때문이다. 이를 통해 단순한 통계적 표현이나 확인을 넘어 의사결정에 도움이 되는 유의미한 데이터가 만들어지기 때문이다. 그 다음은 분석 기법을 선정해야 하는데, 크게 "학습하는 데이터(Training Data)의 유무"와 "목적"에 따라 **지도학습(Supervised Learning)**과 **비지도 학습(Unsupervised Learning)**으로 나눌 수 있다. 
+
+<br>
+
+### 지도학습
+학습 데이터(Training Data)를 기반으로 분석을 통해 모델을 도출하고 새로 입력받은 데이터를 모델에 적용해 예측하는 데이터 분석 기법을 말하는 것이다. 예를 들면 간암 발생 환자의 신체정보를 기반으로 간암 발병 확률을 예측할 수 있는 모델을 구성할 수 있다는 식이며, 회귀분석(regression analysis), 분류분석(classification) 등이 있다.
+
+<br>
+
+### 비지도학습
+비지도학습이란 말 그대로 특정한 답 없이 주어진 데이터를 분석해 자율적으로 답을 
