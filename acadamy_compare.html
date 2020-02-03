@@ -3070,7 +3070,7 @@ Change
 </div>
 </div>
 <div id="t-검정에-대하여" class="section level3">
-<h3>1) t-검정에 대하여</h3>
+<h3>4) t-검정에 대하여</h3>
 <p>데이터 분석 시 여러가지 제약으로 인해 전체(모집단)를 조사하는 것보다 추출된 일부 샘플(표본)을 가지고 모집단을 추정해서 분석하는 경우가 많다. 이렇게 추출된 두 표본을 근거로 그 원천인 모집단을 추정하여 두 모집단이 서로 같은지를 확인하는 기법이 <strong>t-검정(t-test)</strong>이다. 두 기준이 같거나 다르다는 기준은 <strong>“평균”</strong>이다. 간단하게 t-검정에 대해 알아보자. <br></p>
 <p align="center">
 <b><strong>“두 집단의 평균값이 다른가?”</strong> </b><br>
@@ -3083,7 +3083,7 @@ Change
 <p>이러한 가정이 충족된다면 두 표본의 “평균차이”를 두 집단의 “분산정보”로 나눠 t 값을 구하며, t 값이 0에 가까울수록 두 집단 간의 평균차이는 없다고 간주한다. 즉, 두 집단의 분산이 크면 클수록 두 집단의 평균차이는 희석되고 분산이 작으면 작을수록 두 집단의 평균차이는 더 두드러지게 된다. <br> <br></p>
 </div>
 <div id="t.test-함수에-대하여" class="section level3">
-<h3>2) t.test() 함수에 대하여</h3>
+<h3>5) t.test() 함수에 대하여</h3>
 <p>t-검정은 t-test()함수를 사용해 확인할 수 있다. 기본적인 문법은 다음과 같다. <strong>t.test(x, y, paired=TRUE, var,equal=TRUE, alternative=“two.dided”)</strong> 여기서 paired는 대응표본과 독립표본을 설정하며, var.equal은 비교하는 두 집단의 분산이 같은지 여부를 설정하는 옵션이다. “대응표본”인 경우 하나의 집단에 대해 전/후를 비교하는 것이라서 분산에 대한 고민이 필요 없지만 “독립표본”의 경우 집단이 서로 다르기 때문에 <strong>“확률적으로 분산이 같다”</strong>는 전체가 필요하다. 이는 var.test() 함수를 통해 확인이 가능하다.</p>
 <pre class="r"><code>var_test_vector1 &lt;- c(75,67,78,81,53,71,71,55,40,78,76,42,67,98,59,63,84,50,67,80,83)
 var_test_vector2 &lt;- c(58,81,77,80,76,63,54,64,85,54,70,71,71,55,40,78,76,100,51,42,63,61,82,57,48)
@@ -3097,7 +3097,7 @@ var_test_data &lt;- var.test(var_test_vector1,var_test_vector2)</code></pre>
 <p><br><br></p>
 </div>
 <div id="그래서-학원수업-수강은-성적향상에-영향이-있었는가" class="section level3">
-<h3>3) 그래서 학원수업 수강은 성적향상에 영향이 있었는가?</h3>
+<h3>6) 그래서 학원수업 수강은 성적향상에 영향이 있었는가?</h3>
 <pre class="r"><code>t.test(before_study, after_study, paired = TRUE)</code></pre>
 <pre><code>## 
 ##  Paired t-test
@@ -3145,8 +3145,8 @@ var_test_data &lt;- var.test(var_test_vector1,var_test_vector2)</code></pre>
 <hr />
 <p><br></p>
 </div>
-<div id="증감표-테이블" class="section level3">
-<h3>증감표 테이블</h3>
+<div id="첨부-증감표-테이블" class="section level3">
+<h3>첨부: 증감표 테이블</h3>
 <pre class="r"><code># 증감표 테이블
 study_compare %&gt;% 
   mutate(Difference = after_study - before_study) %&gt;%
