@@ -16,6 +16,11 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+<p align="center">
+  <img src="http://bimage.interpark.com/goods_image/5/2/3/6/289055236g.jpg"><br>
+  <b>출처: [**시작하세요! 데이터 분석 with R** : R로 배우는 기초 통계와 데이터 분석 기법](http://book.interpark.com/product/BookDisplay.do?_method=detail&sc.prdNo=289055236&gclid=CjwKCAiAg9rxBRADEiwAxKDTugOPHMLdAS-FsD9d9_Vvx0MCWJazod3jUr3q04oQ4z5DaQGvoTOJkhoCCNAQAvD_BwE)</b><br>
+</p>
+
 # Overview : 데이터 분석
 데이터 분석에 있어서 목적을 명확히 하는 것은 매우 중요하다. 목적을 명확히 함으로써 데이터 가공 형태와 분석 방법이 결정되기 때문이다. 이를 통해 단순한 통계적 표현이나 확인을 넘어 의사결정에 도움이 되는 유의미한 데이터가 만들어지기 때문이다. 그 다음은 분석 기법을 선정해야 하는데, 크게 "학습하는 데이터(Training Data)의 유무"와 "목적"에 따라 **지도학습(Supervised Learning)**과 **비지도 학습(Unsupervised Learning)**으로 나눌 수 있다. 
 
@@ -34,11 +39,11 @@ knitr::opts_chunk$set(echo = TRUE)
 # Topic : 학원이 성적 향상에 도움이 됐는가?
 아래 간단한 예를 통해 학원에서 수강 전과 후의 성적을 비교해보자. 한눈에 보다아도 수강 후의 성적이 조금 더 높음을 알 수 있다. 수강 전의 데이터보다 점수분포가 보다 상향되고, 조금 더 조밀해진 것을 확인할 수 있다. 하지만 이렇게 오른 점수가 우연이 아니라고 이야기하기에는 기준이 명확하지 않고, 시사람의 시각 자체가 모양이나 색깔에 대한 인지 오차가 주관적인 부분이기 때문에 이러한 시각화만으로는 한계가 존재한다. 
 
-```{r}
+```{r fig.align="center"}
 before_study <- c(34, 76, 76, 63, 73, 75, 67, 78, 81, 53, 58, 81, 77, 80, 43, 65, 76, 63, 54, 64, 85, 54, 70, 71, 71, 55, 40, 78, 76, 100, 51, 93, 64, 42, 63, 61, 82, 67, 98, 59, 63, 84, 50, 67, 80, 83, 66, 86, 57, 48)
 after_study <- c (74, 87, 89, 98, 65, 82, 70, 70, 70, 84, 56, 76, 72, 69, 73, 61, 83, 82, 89, 75, 48, 72, 80, 66, 82, 71, 49, 54, 70, 65, 74, 63, 65, 101, 82, 75, 62, 83, 90, 76, 87, 90, 78, 63, 59, 79, 74, 65, 77, 74)
 
-boxplot(after_study, before_study, names = c("수강 후", "수강 전"),
+boxplot(before_study, after_study, names = c("수강 전", "수강 후"),
         col = c("blue", "red"), main = "수강전후 성적비교", xlab = "Status", ylab = "Score")
 ```
 
