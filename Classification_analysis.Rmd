@@ -1,5 +1,5 @@
 ---
-title: "사과 품종 예측하기"
+title: "의사결정 나무기법과 사과 품종 예측하기"
 author: "Jun"
 date: "`r Sys.Date()`"
 output: 
@@ -15,70 +15,59 @@ knitr::opts_chunk$set(echo = TRUE)
 <p align="center">
   <img src="http://bimage.interpark.com/goods_image/5/2/3/6/289055236g.jpg"><br>
   <b>출처: [**시작하세요! 데이터 분석 with R** : R로 배우는 기초 통계와 데이터 분석 기법](http://book.interpark.com/product/BookDisplay.do?_method=detail&sc.prdNo=289055236&gclid=CjwKCAiAg9rxBRADEiwAxKDTugOPHMLdAS-FsD9d9_Vvx0MCWJazod3jUr3q04oQ4z5DaQGvoTOJkhoCCNAQAvD_BwE)</b><br>
-  <b>Github Code: [Jun4871 Github](https://github.com/Jun4871/copy_with_R_book/blob/master/Demand_prediction.Rmd)</b><br>
+  <b>Github Code: [Jun4871 Github](https://github.com/Jun4871/copy_with_R_book/blob/master/Classification_analysis.Rmd)</b><br>
 </p>
-
-# Overview 
-
-<br>
-
-<br>
 
 # 데이터 로드 및 라이브러리 활성화
 
 사과품종 데이터를 불러오는데 에러가 발생했다. 윈도우에 설치된 Rstudio에서는 정상적으로 읽어들였던 것을 생각해보면 AWS 환경과 연관이 있을 것 같다. 이 때 **fileEncoding = "CP949", encoding = "UTF-8"** 옵션을 사용하여 정상적으로 불러올 수 있다. 
-```{r}
+```{r message=FALSE}
 library(rpart)
 library(ggplot2)
 apple_DF <- read.csv("apple_df.csv", fileEncoding = "CP949", encoding = "UTF-8", header = TRUE)
 
 ```
 
-<br>
-
-<br>
 
 # 데이터 탐색
 
 간단하게 데이터를 탐색해보자. 각 컬럼의 속성을 보면 펙터로 표현되어야 할 부분과 숫자형으로 표현되어야하는 부분이 잘 처리되어 있는 것 같다. boxplot() 함수를 사용하여 항목별로 사과 품종을 구분할 수 있을 만한 특징이 있는지 상자그림을 활용해 살펴보도록 하자.  
-```{r}
+```{r message=FALSE}
 str(apple_DF)
 
 summary(apple_DF)
 ```
 
-<br>
-
 # 시각화 
 
-### "사과품종 vs 무게" 
+### 1) "사과품종 vs 무게" 
 
 로얄후지와 마시마가 다른 종에 비해 무게가 많이 나가고, 상대적으로 홍옥은 무게가 적게 나가는 것으로 보인다. 전체적으로 무게를 기준으로 품종이 어느 정도 나누어지지만, 로얄후지와 미시마는 무게만으로 구분하기 쉽지 않아보인다.
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 boxplot(weight ~ model, data = apple_DF, ylab = "무게")
 ```
 
 <br>
 
-### "사과품종 vs 당도"
+### 2) "사과품종 vs 당도"
 
 무게보다 품종 간의 구분이 명확하진 않지만 무게로는 구분이 쉽지 않았던 로얄후지와 미시마는 구분이 된다. 로얄후지보다는 미시마가 더 단맛이 큼을 확인할 수 있다. 
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 boxplot(sugar ~ model, data = apple_DF, ylab = "당도")
 ```
 
-### "사과품종 vs 산도" 
+### 3) "사과품종 vs 산도" 
 
 홍옥의 산도가 월등하다. 확실히 산도가 약 0.6 이상이면 홍옥이라고 봐도 무방할 것으로 보인다.
 
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 boxplot(acid ~ model, data = apple_DF, ylab = "산도")
 ```
 
-### "사과품종 vs 색상" 
+### 4) "사과품종 vs 색상" 
 
 적생은 총 10개로 그 중 로얄후지와 홍옥이 각각 5개이다. 홍색은 총 15개로서 '홍로', '아오리', '미시마'가 각각 5개씩 있다. 샘플 데이터를 기준으로 한다면 사과가 적색일 경우로 얄후지나 홍옥 중 하나일 가능성이 크다. 
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 
 ggplot(data = apple_DF, aes(factor(color), fill=factor(model))) + 
   geom_bar()
@@ -93,11 +82,9 @@ ggplot(data = apple_DF, aes(factor(color), fill=factor(model))) +
 
 <br>
 
-# 분류분석
+# 분류분석 순서 
 
 분류분석에는 의사결정 나무, 나이브 베이즈 분류, 신경망, 서포트 벡터 머신 등이 있다. 여기서 의사결정 나무를 통해서 분류분석을 해볼 것이다. 의사결정 나무는 트리 그래프를 통해 이해와 설명이 용이하고, 대용량 데이터에서도 처리 속도가 빠르며, 비정상 데이터에 대한 민감도가 상대적으로 적어 많이 활용되는 모델이다. 
-
-<br>
 
 ### 1) 훈련 시키기
 
@@ -121,13 +108,11 @@ ggplot(data = apple_DF, aes(factor(color), fill=factor(model))) +
 
 <br>
 
-<br>
-
-# 데이터 나누기
+### 4) 데이터 나누기
 
 의사결정 트리 분석을 하기 전 먼저 모델을 만들 훈련 데이터와 평가에 사용할 테스트 데이터를 나눈다. 먼저 아이리스 데이터로 실습해보겠다. table 함수를 통해 꽃 종류 별로 50개씩 데이터가 균일하게 존재하는 것을 확인할 수 있다. 훈련 데이터는 각 분류 항목들이 골고루 들어가도록 데이터를 구성해야 한다. 이를 위해 꽃 종류별로 직접 훈련 데이터를 선별해 만들 수 있겠지만, caret 패키지의 함수를 활용하면 각 분류 항목별 데이터를 균일한 비율로 손쉽게 추출할 수 있다. createDataPartition 은 데이터 자체를 직접 나누지는 않는다. 다만 팩터 벡터를 입력받아 항목별로 설정한 추출 비율의 데이터를 추출한 후 벡터 내 위치 정보를 결괏값으로 반환한다. 이렇게 추출된 위치 정보를 얻고 나면 데이터프레임으로부터 위치 정보를 이용해 해당 위치의 데이터를 추출할 수 있게 된다. 
 
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 # 데이터 총 건수
 nrow(iris)
 
@@ -158,7 +143,7 @@ table(iris_train_data$Species)
 
 createDataPartition 함수를 활용해 꽃 종류별로 균일하게 40개씩 총 120 건의 훈련 데이터를 추출했다. 전체 데이터 중 훈련 데이터 이외의 건들은 테스트 데이터로 설정한다.
 
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 
 # 테스트 데이터 추출 (iris_row_idx를 제외한 행 데이터 추출)
 # 벡터 내 존재하는 인덱스를 제외하라는 의미는 "-" 기호를 이용함
@@ -185,11 +170,13 @@ iris_rpart_result <- rpart(Species~., data = iris_train_data, control = rpart.co
 iris_rpart_result
 ```
 
-# 의사결정 트리로 결과 보기
+<br>
+
+### 5) 의사결정 트리로 결과 보기
 
 위에서 본 결괏값은 직관적으로 보기가 어려운 부분이 있으므로 그래프화 시켜서 보도록 하자. 이러면 보다 쉽게 이해할 수 있다. 제일 상단의 노드를 Root Node, 분기가 되는 중간 노드를 Branch Node, 제일 끝단의 노드를 Leaf Node라고 한다. 의사결정 트리를 통해 직관적으로 분류모델을 이해할 수 있으나 분류기준이 많아질수록 그래프는 복잡해지고 이해하기 어렵다. 또한 훈련 데이터에 너무 과적합되는 문제가 발생할 수도 있다. 이 때문에 분류 성능을 많이 훼손하지 않으면서 모델을 두 단순화할 수 있는지 확인해 볼 필요가 있으며 이 때 사용하는 것이 CP 이다. CP란 의사결정 가지를 생성할 때 소요되는 복잡도를 의미하는데 "CP 값에 따른 나뭇가지 수"와 "분류 오류율"을 확인할 수 있다. 
 
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 library(rpart.plot)
 
 rpart.plot(iris_rpart_result)
@@ -197,9 +184,11 @@ rpart.plot(iris_rpart_result)
 iris_rpart_result$cptable
 ```
 
+<br>
+
 cptable을 통해 CP 값이 0.01일 때 나눠지는 의사결정 분류기준은 7가지며, 오류율을 0%임을 확인할 수 있다. 가지치기 전 분류 모델은 기본적으로 오류율이 제일 낮은 CP 값으로 선택한다. CP 값이 0.0125인 경우를 보면, 오류율이 3.75로 높아졌지만 의사결정 분류 기준은 2개로 줄어들었다. 오류율이 다소 오르더라도 모델을 단순화하는 것이 좀 더 범용적인 케이스에 적용 가능하고 더욱 직관적인 모델이 될 수 있다. 이제 CP 값 0.0125를 기준으로 가지치기 해보자. 가지치기에는 prune() 함수를 사용한다.
 
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 # 가지치기
 
 iris_prune_tree <- prune(iris_rpart_result, cp = 0.0125)
@@ -211,11 +200,13 @@ rpart.plot(iris_prune_tree)
 
 오류율은 다소 높아졌지만 더 단순하게 모델이 변경된 것을 확인할 수 있다. 또한 의사결정 트리를 통해 꽃 종류를 구분하는데 영향을 미치는 중요한 요소는 꽃잎의 길이와 폭이라는 것도 알 수 있따. 
 
-# 예측하기
+<br>
+
+### 6) 예측하기
 
 이제 도출된 분류 예측 모델을 기반으로 분류 예측을 해보자. 분류 예측에는 predict 함수를 사용한다. 
 
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 # 테스트 데이터 확인 - 훈련 데이터와 칼럼명이 같어야 함.
 str(iris_test_data)
 
@@ -223,9 +214,11 @@ str(iris_test_data)
 predict(iris_rpart_result, iris_test_data, type = "class")
 ```
 
+<br>
+
 iris_test_data를 입력받아 꽃 종류를 예측했다. 하지만 분류 결과를 옆으로 나열만 하다 보니 한눈에 보기가 쉽지 않다. 이번에는 꽃 종류의 실제 값과 예측 값을 한눈에 볼 수 있도록 두 항목을 하나의 데이터프레임 형태로 구성해 보도록 하자.
 
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 
 # 실제 값과 예상 값을 한눈에 볼 수 있게 데이터프레임 만들기
 actual <- iris_test_data$Species
@@ -241,14 +234,97 @@ iris_predict_df
 
 실제 값과 예상 값을 나란히 보니 결괏값 확인이 조금 더 편리해졌음을 알 수 있다.
 
-# 평가하기
+<br>
+
+### 7) 평가하기
 
 이제 분류한 예측 값을 평가해 보자. 먼저 table 함수를 통해 혼동행렬을 확인해보자.
 
-```{r}
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
 table(iris_predict_df)
 
 confusionMatrix(expect, actual, mode ="everything")
 ```
 
 위 결과의 주요 지표를 보면 정확도가 약 96%, Kappa 계수 0.95로 예측 결과가 상당히 정확하다는 것을 알 수 있다. No Information Rate 라는 항목은 전체 데이터 중 가장 많은 항목이 차지하는 비율이다. 즉 정확도가 이것보다는 높아야 분류를 제대로 하고 있다 라고 볼 수 있다. 
+
+<br>
+
+# 사과 품종 분류
+
+앞서 iris 데이터로 실습을 해보았는데, 본래 취지에 맞게 사과 품종을 분류하는 모델을 생성해보자. 
+
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
+summary(apple_DF)
+
+# 훈련 데이터 (전체 중 80% 사용)
+apple_train_idx <- createDataPartition(apple_DF$model, p=0.8, list = FALSE)
+
+# 총 데이터 개수
+nrow(apple_DF)
+
+# 훈련 데이터 추출할 인덱스 개수 확인
+nrow(apple_train_idx)
+
+# 훈련 데이터 추출
+apple_train_df <- apple_DF[apple_train_idx, ]
+
+# 테스트 데이터 추출
+apple_test_df <- apple_DF[-apple_train_idx, ]
+
+```
+
+<br>
+
+이제 훈련데이터를 기반으로 분류모델을 도출하자.
+
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
+# 분류분석 - rpart 함수 실행
+apple_rpart_result <- rpart(model~., data = apple_train_df, control = rpart.control(minsplit = 2))
+
+# 의사결정 나무 그리기
+rpart.plot(apple_rpart_result)
+```
+
+<br>
+
+도출한 분류 모델을 혼동행렬을 통해 평가해보니, 정확도 100, Kappa 100 으로 높은 정확도를 보여주고 있다.  
+
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
+# 실제 값과 예상 값을 한눈에 볼 수 있게 데이터프레임 만들기
+# actual : 실제 값, expect : 예상 값
+
+actual_aplle <- apple_test_df$model
+expect_apple <- predict(apple_rpart_result, apple_test_df, type = "class")
+
+# 혼동행렬
+confusionMatrix(expect_apple, actual_aplle, mode ="everything")
+```
+
+<br>
+
+이제 과적합 문제를 보완하기 위해 가지치기를 해보자. 조금 더 간결한 모습으로 문류모델이 만들어졌음을 알 수 있다. 
+
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
+# cp table 조회 
+apple_rpart_result$cptable
+
+# 가지치기 - 오류율이 6%로 높아지지만, nsplit 이 4인 cp 값 적용
+apple_prune_tree <- prune(apple_rpart_result, cp = 0.0625)
+
+# 가지치기 후 모델 확인
+rpart.plot(apple_prune_tree)
+```
+
+<br>
+
+가지치기를 한 후 성능에 큰 영향이 없는지 다시 확인해보자. 정확도 0.8, Kappa 0.75로 가지치기 전 모델과 동일한 것으로 보아 가지치기를 적용한 후에도 모델의 정확도가 크게 훼손되지 않았음을 알 수 있다. 이런식으로 무게, 당도, 산도, 색상을 가지고 사과의 품종을 분류하는 모델을 만들어 보았다. 
+
+```{r message=FALSE, fig.align="center", fig.height=8, fig.width = 14}
+actual_aplle <- apple_test_df$model
+expect_apple <- predict(apple_prune_tree, apple_test_df, type="class")
+
+confusionMatrix(expect_apple, actual_aplle, mode = "everything")
+
+```
+
