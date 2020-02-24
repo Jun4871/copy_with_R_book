@@ -24,7 +24,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r message=FALSE}
 library(rpart)
 library(ggplot2)
+library(caret)
+library(rpart.plot)
 apple_DF <- read.csv("apple_df.csv", fileEncoding = "CP949", encoding = "UTF-8", header = TRUE)
+apple_DF <- apple_DF[,-1]
 
 ```
 
