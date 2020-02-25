@@ -1,10 +1,10 @@
 ---
-title: "Association_analysis"
+title: "배낭여행과 관련된 연관 키워드 찾기"
 author: "Jun"
 date: "`r Sys.Date()`"
 output: 
    prettydoc::html_pretty:
-    theme: architect
+    theme: leonids
     df_print: paged
 ---
 ```{r setup, include=FALSE}
@@ -17,11 +17,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # 패키지 설치 및 데이터 준비
 
-apriori 함수를 실행한 후 지지도 0.1, 신뢰도 0.8 이상인 연관성 규칙이 81개 도출된 것을 확인할 수 있다. 
+분석을 위한 샘플을 직접 만들고 apriori 함수를 적용해 보았다. 지지도 0.1, 신뢰도 0.8 이상인 연관성 규칙이 81개 도출된 것을 확인할 수 있다. 
 
-```{r}
+```{r  message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 #install.packages("arules")
-install.packages("arulesViz")
+#install.packages("arulesViz")
 
 library(arules)
 
@@ -81,7 +81,7 @@ buyItemResult <- apriori(buyItems, parameter = list(support=0.1, confidence=0.8)
 
 연관성 분석 결과는 inspect 함수를 통해 연관성 규칙을 확인할 수 있다. 81개의 연관성 규칙 중 5개만 우선 확인해 보자. 
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 # 도출된 연관성 규칙 5개만 확인
 buyItemResult[1:5]
 
@@ -91,7 +91,7 @@ inspect(buyItemResult[1:5])
 
 연관성 규칙과 함께 해당 규칙의 지지도, 신뢰도, 향상도, 연관성 규칙을 만족하는 거래 수가 출력되는 것을 확인할 수 있다. 이번에는 81개의 규칙 중 향상도가 1인 규칙은 우연에 의해 발생할 가능서잉 높은 연관성 규칙이므로 향상도가 1.2 이상인 규칙만 골라보자. 연관성 분석 결과는 데이터프레임과 동일하게 subset 함수를 통해 일부 연관성 규칙들을 발췌할 수 있다. 
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 # 향상도가 1.2 이상인 연관성 규칙만 선택
 subBuyResult <- subset(buyItemResult, subset=lift > 1.2)
 
@@ -104,7 +104,7 @@ inspect(subBuyResult[1:5])
 
 원인(lhs)과 결과(rhs)에 대해서도 논리식을 통해 특정 항목의 연관성 규칙만 뽑아 확인해 볼 수 있다. 
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 # lhs에 삼겹살이 포함된 연관성 규칙
 inspect(subset(buyItemResult, subset=lhs %in% c("삼겹살")))
 
@@ -120,7 +120,7 @@ inspect(subset(buyItemResult, subset = lhs %pin% "겹"))
 
 연관성 분석 결과는 sort 함수를 통해 지지도, 신뢰도, 향상도 기준으로 정렬할 수 있다. 지지도, 신뢰도, 향상도를 기준으로 정렬 후 상위 10개만 확인해 보겠다. 
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 # 지지도, 신뢰도, 향상도 기준으로 정렬
 subBuyResult_order <- sort(subBuyResult, by=c("support", "lift", "confidence"))
 
@@ -138,7 +138,7 @@ inspect(subBuyResult_order[1:10])
 
 arules 패키지의 itemFrequencyPlot 함수를 활용하면 항목별 거래 빈도수를 확인할 수 있다. 항목이 너무 많은 경우에는 최소 지지도를 설정하믕로써 특정 비율 이상인 항목에 대해서만 그래프에 표현할 수도 있다. 
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 
 # 항목별 빈도수 시각화(최소 지지도 0.2 이상인 항목에 대해서만 빈도수 확인)
 # itemFrequencyPlot 함수는 "트랜젝션 데이터"를 입력 항목으로 받는다.
@@ -151,7 +151,7 @@ itemFrequencyPlot(buyItems, support=0.2)
 
 평행좌표 그래프는 여러 연관성 규칙들을 하나의 그래프로 확인할 수 있도록 시각화를 하는 것이다. y축에 항목들을 나열한 후 연관된 항목들을 수평으로 결과까지 연결시킴으로써 각 항목들이 어느 항목들과 연관성을 가지고 있는지 파악할 수 있다. 
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 library(arulesViz)
 
 # 3번째 연관성 규칙 확인
@@ -163,7 +163,7 @@ plot(subBuyResult_order[3], method ="paracoord")
 
 위 그래프는 {땅콩, 생수} => {맥주} 연관성 규칙에 대한 평행좌표 그래프이다. 땅콩과 생수를 거쳐 맥주까지 연관성을 가지는 항목들을 연결해 표현한 것을 확인할 수 있다. 이번에는 여러 연관성 규칙을 동시에 확인해보자. 
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 # 3,5,33,50 번째 연관성 규칙 확인
 inspect(subBuyResult_order[c(3,5,33,50)])
 
@@ -177,7 +177,7 @@ plot(subBuyResult_order[c(3,5,33,50)], method = "paracoord")
 
 네트워크 그래프란 항목 간의 연관성을 네트워크 형태로 표현함으로써 연관성이 있는 항목들의 관계를 파악할 수 있는 그래프이다. 네트워크 그래프 또한 arulesViz 패키지의 plot 함수를 통해 생성할 수 있다. 
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 # 처음 10개의 연관성 분석 확인
 inspect(subBuyResult_order[1:10])
 
@@ -189,7 +189,7 @@ plot(subBuyResult_order[1:10], method = "graph")
 
 # 배낭여행과 관련된 검색어를 찾아보자
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 # 고객 검색 내역 확인
 str(searchL)
 
@@ -205,7 +205,7 @@ inspect(searchT)
 
 트랜잭션 데이터로 변환된 검색어 정보를 apriori 함수에 입력해 연관성을 분석한다.
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 # 연관성 분석 (지지도 0.1 이상, 신뢰도 0.8 이상 연관성 규칙 도출)
 aResult <- apriori(searchT, parameter = list(support=0.1, confidence=0.8))
 
@@ -219,9 +219,47 @@ inspect(aResult)
 
 도출된 연관성 규칙 중 조건 또는 결과에 "배낭여행"이라는 항목이 존재하는 연관성 규칙만 따로 추출해보자.
 
-```{r}
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
 # 배낭여행을 포함하는 연관성 규칙 추출
-packResult <- subset(aResult, subset=lhs %in% c("배낭여행") )
+packResult <- subset(aResult, subset=lhs %in% c("배낭여행") | rhs %in% c("배낭여행"))
+
+# 연관성 규칙확인
+inspect(packResult)
 
 ```
 
+마지막으로 도출된 연관성 규칙에서 배낭여행과 관련된 검색어를 추출해 보도록 하자. 연관성 규칙의 조건과 결과 항목을 조회하는 lhs 함수와 rhs 함수를 활용한다.
+
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
+# 조건 항목만 별도 추출해 리스트로 변환
+packLhs <- as(lhs(packResult), "list")
+
+# 조건 항목 확인
+str(packLhs)
+
+# 결과 항목만 별도 추출해 ㅣ스트로 변환
+packRhs <- as(rhs(packResult), "list")
+
+# 결과 항목 확인
+str(packRhs)
+
+# 조건과 결과 항목을 벡터로 변환
+vPackWord <- unlist(packLhs, packRhs)
+
+# 배낭여행과 연관된 검색어 확인
+vPackWord
+
+
+# 중복 항목 제거
+unique(vPackWord)
+```
+
+위의 결과를 통해 배낭여행과 관련된 검색어로 "유럽", "호스텔", "파리"가 있음을 확인할 수 있다. 도출된 연관성 분석 결과는 네트워크 그래프로 시각화함으로써 연관관계를 직관적으로 파악할 수도 있다. 
+
+```{r message=FALSE,fig.align="center", fig.height=8, fig.width = 14}
+
+# 검색어 네트워크 그래프
+plot(aResult, method = "graph")
+```
+
+네트워크 그래프를 통해 배낭여행을 하는 고객에게는 호스텔 관련 숙박정보를 제공하고 허니문 고객에게는 풀빌라, 가족여행인 경우 리조트를 추천하는 것이 효과적이라는 것을 확인할 수 있다. 데이터가 많을수록 도출된 연관성의 신뢰도는 높아진다. 이미 알고 있는 일반적인 규칙을 다시 확인하는 것도 의미는 있겠지만 그보다는 비록 상대적으로 약한 연관성을 가지고 있더라도 평소 눈에 보이지 않았던 연관성을 찾아내고 숨어있는 의미를 이해하는 것이 더욱 바람직한 활용법이라 할 수 있을 것이다. 
